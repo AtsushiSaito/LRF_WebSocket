@@ -15,7 +15,7 @@ extension ViewController: WebSocketDelegate {
         
         var newROSOP = ROSOP()
         newROSOP.op = "subscribe"
-        newROSOP.topic = "/lightsensors"
+        newROSOP.topic = "/scan"
         
         let SendData = try! JSONEncoder().encode(newROSOP)
         let SendJson = String(data: SendData, encoding: .utf8)!
@@ -27,18 +27,24 @@ extension ViewController: WebSocketDelegate {
     }
     
     func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
-        let LightSensor = try! JSONDecoder().decode(LightSensors.self, from: text.data(using: .utf8)!)
-        //print("LS:", LightSensor.msg.left_side!, "LF:", LightSensor.msg.left_forward!, "RF:", LightSensor.msg.right_forward!, "RS:", LightSensor.msg.right_side!)
-        self.ResultLabel.text =
-        "LS: " + String(LightSensor.msg.left_side!) + ", " +
-        "LF: " + String(LightSensor.msg.left_forward!) + ", " +
-        "RF: " + String(LightSensor.msg.right_forward!) + ", " +
-        "RS: " + String(LightSensor.msg.right_side!)
+        let LaserScanData = try! JSONDecoder().decode(LaserScan.self, from: text.data(using: .utf8)!)
+        print(LaserScanData.msg.ranges.count)
         
-        self.ls_Layer.frame = CGRectMake(0, 150, self.interval, CGFloat(LightSensor.msg.left_side!) * 0.15)
-        self.lf_Layer.frame = CGRectMake(self.interval, 150, self.interval, CGFloat(LightSensor.msg.left_forward!) * 0.15)
-        self.rf_Layer.frame = CGRectMake(self.interval*2, 150, self.interval, CGFloat(LightSensor.msg.right_forward!) * 0.15)
-        self.rs_Layer.frame = CGRectMake(self.interval*3, 150, self.interval, CGFloat(LightSensor.msg.right_side!) * 0.15)
+        for i in 0..<LaserScanData.msg.ranges.count {
+            let num: CGFloat
+            if(LaserScanData.msg.ranges[i] == nil){
+                num = 0
+            }else{
+                num = CGFloat(LaserScanData.msg.ranges[i]! * 200)
+            }
+            self.Layers[i].frame = CGRectMake(self.interval*CGFloat(i), 150, self.interval, num)
+        }
+        //let LightSensor = try! JSONDecoder().decode(LightSensors.self, from: text.data(using: .utf8)!)
+        
+        /*self.Layers[0].frame = CGRectMake(0, 150, self.interval, CGFloat(LightSensor.msg.left_side!) * 0.15)
+        self.Layers[1].frame = CGRectMake(self.interval, 150, self.interval, CGFloat(LightSensor.msg.left_forward!) * 0.15)
+        self.Layers[2].frame = CGRectMake(self.interval*2, 150, self.interval, CGFloat(LightSensor.msg.right_forward!) * 0.15)
+        self.Layers[3].frame = CGRectMake(self.interval*3, 150, self.interval, CGFloat(LightSensor.msg.right_side!) * 0.15)*/
     }
     
     func websocketDidReceiveData(socket: WebSocketClient, data: Data) {
@@ -53,6 +59,8 @@ class ViewController: UIViewController{
     
     var MyWebSocket: WebSocket!
     
+    var Layers: [CALayer] = []
+    
     var ls_Layer: CALayer!
     var lf_Layer: CALayer!
     var rs_Layer: CALayer!
@@ -60,6 +68,8 @@ class ViewController: UIViewController{
     
     var screenWidth = CGFloat(0.0)
     var screenHeight = CGFloat(0.0)
+    
+    var SensorNum = CGFloat(360)
     
     var interval: CGFloat!
     
@@ -71,12 +81,12 @@ class ViewController: UIViewController{
         self.screenWidth = self.view.bounds.width
         self.screenHeight = self.view.bounds.height
         
-        self.interval = self.screenWidth / 4
+        self.interval = self.screenWidth / SensorNum
         
         self.view.backgroundColor = #colorLiteral(red: 1, green: 1, blue: 1, alpha: 1)
         
         self.HomeLabel = UILabel()
-        self.HomeLabel.text = "Sensor on RaspberryPI Mouse"
+        self.HomeLabel.text = "LRF(Laser RangeFinder)"
         self.HomeLabel.frame = CGRect(x:0 , y: 50, width: self.view.bounds.width, height: 50)
         self.HomeLabel.textAlignment = .center
         
@@ -93,29 +103,29 @@ class ViewController: UIViewController{
         
         self.view.addSubview(self.HomeLabel)
         self.view.addSubview(self.ConnectButon)
-        //self.view.addSubview(self.ResultLabel)
         
-        self.ls_Layer = CALayer()
-        self.ls_Layer.frame = CGRectMake(0, 150 , self.interval, 0)
-        self.ls_Layer.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
+        let BackLayer = CALayer()
+        BackLayer.frame = CGRectMake(0, 150 , self.screenWidth, screenHeight)
+        BackLayer.backgroundColor = #colorLiteral(red: 0.06274510175, green: 0, blue: 0.1921568662, alpha: 1)
         
-        self.lf_Layer = CALayer()
-        self.lf_Layer.frame = CGRectMake(self.interval, 150, self.interval, 0)
-        self.lf_Layer.backgroundColor = #colorLiteral(red: 0.9372549057, green: 0.3490196168, blue: 0.1921568662, alpha: 1)
+        self.view.layer.addSublayer(BackLayer)
         
-        self.rf_Layer = CALayer()
-        self.rf_Layer.frame = CGRectMake(self.interval*2, 150, self.interval, 0)
-        self.rf_Layer.backgroundColor = #colorLiteral(red: 0.1764705926, green: 0.4980392158, blue: 0.7568627596, alpha: 1)
-        
-        self.rs_Layer = CALayer()
-        self.rs_Layer.frame = CGRectMake(self.interval*3, 150, self.interval, 0)
-        self.rs_Layer.backgroundColor = #colorLiteral(red: 0.3411764801, green: 0.6235294342, blue: 0.1686274558, alpha: 1)
-        
-        self.view.layer.addSublayer(self.ls_Layer)
-        self.view.layer.addSublayer(self.lf_Layer)
-        self.view.layer.addSublayer(self.rf_Layer)
-        self.view.layer.addSublayer(self.rs_Layer)
-        
+        for i in 0..<360 {
+            self.makeSensorLayer(frame: CGRectMake(self.interval*CGFloat(i), 150 , self.interval, 0))
+            self.Layers[i].backgroundColor = UIColor(red: Frandom(), green: Frandom(), blue: Frandom(), alpha: 1.0).cgColor
+            self.view.layer.addSublayer(self.Layers[i])
+        }
+    }
+    
+    func Frandom() -> CGFloat{
+        return CGFloat(Float(arc4random()) / Float(UINT32_MAX))
+    }
+    
+    func makeSensorLayer(frame: CGRect){
+        let Layer = CALayer()
+        Layer.frame = frame
+        Layer.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
+        self.Layers.append(Layer)
     }
     
     @objc func ConnectWebSocket(sender: Any){
