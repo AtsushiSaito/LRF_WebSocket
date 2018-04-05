@@ -9,19 +9,21 @@
 /* Begin PBXBuildFile section */
 		0D87A7D620765004008E82AD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D87A7D520765004008E82AD /* AppDelegate.swift */; };
 		0D87A7D820765004008E82AD /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D87A7D720765004008E82AD /* ViewController.swift */; };
-		0D87A7DB20765004008E82AD /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0D87A7D920765004008E82AD /* Main.storyboard */; };
 		0D87A7DD20765004008E82AD /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0D87A7DC20765004008E82AD /* Assets.xcassets */; };
 		0D87A7E020765004008E82AD /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 0D87A7DE20765004008E82AD /* LaunchScreen.storyboard */; };
+		0D87A7EA207650F8008E82AD /* Starscream.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D87A7E9207650F8008E82AD /* Starscream.framework */; };
+		0D87A7EC20765B41008E82AD /* ROSClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D87A7EB20765B41008E82AD /* ROSClass.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0D87A7D220765004008E82AD /* LRF_WebSocket.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LRF_WebSocket.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D87A7D520765004008E82AD /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		0D87A7D720765004008E82AD /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
-		0D87A7DA20765004008E82AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		0D87A7DC20765004008E82AD /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		0D87A7DF20765004008E82AD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		0D87A7E120765004008E82AD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0D87A7E9207650F8008E82AD /* Starscream.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Starscream.framework; path = Carthage/Build/iOS/Starscream.framework; sourceTree = "<group>"; };
+		0D87A7EB20765B41008E82AD /* ROSClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ROSClass.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -29,6 +31,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D87A7EA207650F8008E82AD /* Starscream.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -40,6 +43,7 @@
 			children = (
 				0D87A7D420765004008E82AD /* LRF_WebSocket */,
 				0D87A7D320765004008E82AD /* Products */,
+				0D87A7E8207650F8008E82AD /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -55,13 +59,21 @@
 			isa = PBXGroup;
 			children = (
 				0D87A7D520765004008E82AD /* AppDelegate.swift */,
+				0D87A7EB20765B41008E82AD /* ROSClass.swift */,
 				0D87A7D720765004008E82AD /* ViewController.swift */,
-				0D87A7D920765004008E82AD /* Main.storyboard */,
 				0D87A7DC20765004008E82AD /* Assets.xcassets */,
 				0D87A7DE20765004008E82AD /* LaunchScreen.storyboard */,
 				0D87A7E120765004008E82AD /* Info.plist */,
 			);
 			path = LRF_WebSocket;
+			sourceTree = "<group>";
+		};
+		0D87A7E8207650F8008E82AD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				0D87A7E9207650F8008E82AD /* Starscream.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,6 +86,7 @@
 				0D87A7CE20765004008E82AD /* Sources */,
 				0D87A7CF20765004008E82AD /* Frameworks */,
 				0D87A7D020765004008E82AD /* Resources */,
+				0D87A7E7207650E1008E82AD /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -124,17 +137,34 @@
 			files = (
 				0D87A7E020765004008E82AD /* LaunchScreen.storyboard in Resources */,
 				0D87A7DD20765004008E82AD /* Assets.xcassets in Resources */,
-				0D87A7DB20765004008E82AD /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		0D87A7E7207650E1008E82AD /* ShellScript */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/Carthage/Build/iOS/Starscream.framework",
+			);
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "/usr/local/bin/carthage copy-frameworks";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		0D87A7CE20765004008E82AD /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0D87A7EC20765B41008E82AD /* ROSClass.swift in Sources */,
 				0D87A7D820765004008E82AD /* ViewController.swift in Sources */,
 				0D87A7D620765004008E82AD /* AppDelegate.swift in Sources */,
 			);
@@ -143,14 +173,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
-		0D87A7D920765004008E82AD /* Main.storyboard */ = {
-			isa = PBXVariantGroup;
-			children = (
-				0D87A7DA20765004008E82AD /* Base */,
-			);
-			name = Main.storyboard;
-			sourceTree = "<group>";
-		};
 		0D87A7DE20765004008E82AD /* LaunchScreen.storyboard */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -282,6 +304,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 44GM7JGY8B;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = LRF_WebSocket/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -300,6 +326,10 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 44GM7JGY8B;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/Carthage/Build/iOS",
+				);
 				INFOPLIST_FILE = LRF_WebSocket/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
