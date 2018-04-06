@@ -28,16 +28,24 @@ extension ViewController: WebSocketDelegate {
     
     func websocketDidReceiveMessage(socket: WebSocketClient, text: String) {
         let LaserScanData = try! JSONDecoder().decode(LaserScan.self, from: text.data(using: .utf8)!)
-        print(LaserScanData.msg.ranges.count)
+        //print(LaserScanData.msg.ranges.count)
         
         for i in 0..<LaserScanData.msg.ranges.count {
             let num: CGFloat
             if(LaserScanData.msg.ranges[i] == nil){
                 num = 0
             }else{
-                num = CGFloat(LaserScanData.msg.ranges[i]! * 200)
+                num = CGFloat(LaserScanData.msg.ranges[i]! * 100)
             }
-            self.Layers[i].frame = CGRectMake(self.interval*CGFloat(i), 150, self.interval, num)
+            let CenterPoint = CGPoint(x: self.screenWidth/2, y: self.screenHeight/2 + 50)
+            let MovePoint = CGPoint(x: CenterPoint.x + (num * cos(radianFrom(deg: i))), y: CenterPoint.y + (num * sin(radianFrom(deg: i))))
+            
+            let UiPath = UIBezierPath()
+            UiPath.move(to: CenterPoint)
+            UiPath.addLine(to: MovePoint)
+            
+            self.Layers[i].path = UiPath.cgPath
+            //self.Layers[i].frame = CGRectMake(self.screenWidth/2 - num, self.screenHeight/2 + 100 - num, self.interval, num)
         }
         //let LightSensor = try! JSONDecoder().decode(LightSensors.self, from: text.data(using: .utf8)!)
         
@@ -59,7 +67,7 @@ class ViewController: UIViewController{
     
     var MyWebSocket: WebSocket!
     
-    var Layers: [CALayer] = []
+    var Layers: [CAShapeLayer] = []
     
     var ls_Layer: CALayer!
     var lf_Layer: CALayer!
@@ -75,7 +83,7 @@ class ViewController: UIViewController{
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.MyWebSocket = WebSocket(url: URL(string: "ws://192.168.3.180:9000/")!)
+        self.MyWebSocket = WebSocket(url: URL(string: "ws://192.168.22.26:9000/")!)
         self.MyWebSocket.delegate = self
         
         self.screenWidth = self.view.bounds.width
@@ -106,26 +114,43 @@ class ViewController: UIViewController{
         
         let BackLayer = CALayer()
         BackLayer.frame = CGRectMake(0, 150 , self.screenWidth, screenHeight)
-        BackLayer.backgroundColor = #colorLiteral(red: 0.06274510175, green: 0, blue: 0.1921568662, alpha: 1)
+        BackLayer.backgroundColor = #colorLiteral(red: 0.03277932029, green: 0, blue: 0.100815383, alpha: 1)
         
         self.view.layer.addSublayer(BackLayer)
         
         for i in 0..<360 {
-            self.makeSensorLayer(frame: CGRectMake(self.interval*CGFloat(i), 150 , self.interval, 0))
+            let hei = Frandom()*100
+            self.makeSensorLayer(theta: radianFrom(deg: i), radius: hei)
             self.Layers[i].backgroundColor = UIColor(red: Frandom(), green: Frandom(), blue: Frandom(), alpha: 1.0).cgColor
             self.view.layer.addSublayer(self.Layers[i])
         }
+    }
+    
+    func radianFrom(deg: Int) -> CGFloat {
+        return CGFloat.pi / 180.0 * CGFloat(deg)
     }
     
     func Frandom() -> CGFloat{
         return CGFloat(Float(arc4random()) / Float(UINT32_MAX))
     }
     
-    func makeSensorLayer(frame: CGRect){
-        let Layer = CALayer()
-        Layer.frame = frame
-        Layer.backgroundColor = #colorLiteral(red: 0.9098039269, green: 0.4784313738, blue: 0.6431372762, alpha: 1)
-        self.Layers.append(Layer)
+    func makeSensorLayer(theta: CGFloat, radius: CGFloat){
+        let ShapeLayer = CAShapeLayer()
+        let UiPath = UIBezierPath()
+        
+        let CenterPoint = CGPoint(x: self.screenWidth/2, y: self.screenHeight/2 + 50)
+        let MovePoint = CGPoint(x: CenterPoint.x + (radius * cos(theta)), y: CenterPoint.y + (radius * sin(theta)))
+        
+        UiPath.move(to: CenterPoint)
+        UiPath.addLine(to: MovePoint)
+        
+        //ShapeLayer.strokeColor = UIColor(red: Frandom(), green: Frandom(), blue: Frandom(), alpha: 1.0).cgColor
+        ShapeLayer.strokeColor = #colorLiteral(red: 0.8078431487, green: 0.02745098062, blue: 0.3333333433, alpha: 1)
+        ShapeLayer.path = UiPath.cgPath
+        ShapeLayer.lineDashPattern = [1, 1]
+        ShapeLayer.lineWidth = 1.0
+        
+        self.Layers.append(ShapeLayer)
     }
     
     @objc func ConnectWebSocket(sender: Any){
